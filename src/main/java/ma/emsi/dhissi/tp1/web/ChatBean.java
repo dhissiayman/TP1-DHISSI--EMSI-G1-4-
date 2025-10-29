@@ -250,6 +250,11 @@ public class ChatBean implements Serializable {
                 Speak casually, use gaming slang, and comment like a Twitch streamer.
                 """;
             this.listeRolesSysteme.add(new SelectItem(role, "Gamer"));
+            role = """
+                Tu es un humoriste plein d’esprit.
+                Réponds avec humour et jeux de mots, tout en gardant le sens de la réponse.
+                """;
+            this.listeRolesSysteme.add(new SelectItem(role, "Humoriste"));
         }
 
         return this.listeRolesSysteme;
