@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>TP1-LLM-GEMINI</title>
+    <h:outputStylesheet name="css/styles.css"/>
+    <h:outputScript name="js/app.js" target="body"/>
+</h:head>
+
+<h:body>
+    <h:form id="form">
+
+        <div class="header box">
+            <h2>TP1 — Mini Chat (Agent GEMINI)</h2>
+            <span class="badge">Jakarta EE 11</span>
+        </div>
+
+        <div class="box">
+            <h3>Rôle de l’API</h3>
+
+            <p:outputLabel for="rolesysteme" value="Rôle de l'API : "/>
+            <!-- La valeur choisie dans cette liste déroulante sera affectée
+            à la propriété systemRole du backing bean. Cette liste est figée (disabled)
+            dès qu'une requête a été envoyée au serveur. -->
+            <p:selectOneMenu id="rolesysteme" value="#{chat.roleSysteme}" editable="true"
+                             required="true" requiredMessage="Vous devez indiquer le rôle de l'API"
+                             disabled="#{! chat.roleSystemeChangeable}">
+                <f:selectItems value="#{chat.rolesSysteme}"/>
+            </p:selectOneMenu>
+
+
+            <p:message for="rolesysteme" display="text"/>
+
+            <p:commandButton value="Nouveau chat" action="#{chat.nouveauChat}"
+                             onclick="return confirm('Démarrer un nouveau chat ?');"
+                             styleClass="ui-button-secondary" update="@form"/>
+        </div>
+
+        <div class="grid">
+            <div class="left-column">
+                <div class="box">
+                    <h3>Question</h3>
+                    <h:inputTextarea id="question" styleClass="area" value="#{chat.question}" label="Question"/>
+                    <p:message for="question" display="text"/>
+
+                    <div class="toolbar" style="margin-top:8px">
+                        <p:commandButton value="Envoyer" action="#{chat.envoyer}" update="@form"/>
+                        <p:commandButton value="Effacer la dernière" action="#{chat.effacerDerniere}"
+                                         update="@form" styleClass="ui-button-warning"/>
+                        <h:commandButton type="button" value="Copier la question"
+                                         onclick="copyToClipboard('form:question')"/>
+
+                        <!-- ====== BOUTON MODE DEBUG ====== -->
+                        <p:commandButton id="debugbutton"
+                                         value="#{chat.debug ? 'Mode normal' : 'Mode debug'}"
+                                         action="#{chat.toggleDebug}"
+                                         update="@form"
+                                         styleClass="ui-button-secondary"
+                                         style="margin-left:8px"/>
+                    </div>
+                </div>
+
+                <div class="box">
+                    <h3>Réponse</h3>
+                    <h:inputTextarea id="reponse" styleClass="area" value="#{chat.reponse}" readonly="true"/>
+                    <div class="toolbar" style="margin-top:8px">
+                        <h:commandButton type="button" value="Copier la réponse"
+                                         onclick="copyToClipboard('form:reponse')"/>
+                    </div>
+                </div>
+
+                <h:panelGroup rendered="#{chat.chiffreur}">
+                    <div class="box">
+                        <h3>Clé (Base64)</h3>
+                        <h:inputTextarea id="cle" styleClass="area" value="#{chat.clefBase64}" readonly="true"/>
+                        <div class="toolbar" style="margin-top:8px">
+                            <h:commandButton type="button" value="Copier la clé"
+                                             onclick="copyToClipboard('form:cle')"/>
+                        </div>
+                    </div>
+                </h:panelGroup>
+            </div>
+
+            <div class="right-column">
+                <div class="box">
+                    <h3>Historique</h3>
+                    <h:inputTextarea id="historique" styleClass="area" value="#{chat.historique}" readonly="true"/>
+                    <div class="toolbar" style="margin-top:8px">
+                        <h:commandButton type="button" value="Copier l’historique"
+                                         onclick="copyToClipboard('form:historique')"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== PANEL DEBUG JSON ====== -->
+        <h:panelGrid id="paneldebug" columns="1" rendered="#{chat.debug}" styleClass="box" style="margin-top:20px">
+
+            <h:panelGroup layout="block" styleClass="toolbar" style="margin-bottom:6px">
+                <h:outputText value="JSON envoyé dans la requête :" style="font-weight:bold; margin-right:8px"/>
+                <button type="button" onclick="copyToClipboard('form:jsonrequete')">Copier requête JSON</button>
+            </h:panelGroup>
+
+            <h:inputTextarea id="jsonrequete"
+                             value="#{chat.texteRequeteJson}"
+                             title="Requête JSON"
+                             styleClass="area"
+                             cols="100" rows="12"
+                             readonly="true" />
+
+            <h:panelGroup layout="block" styleClass="toolbar" style="margin:12px 0 6px 0">
+                <h:outputText value="JSON retourné dans la réponse :" style="font-weight:bold; margin-right:8px"/>
+                <button type="button" onclick="copyToClipboard('form:jsonreponse')">Copier réponse JSON</button>
+            </h:panelGroup>
+
+            <h:inputTextarea id="jsonreponse"
+                             value="#{chat.texteReponseJson}"
+                             title="Réponse JSON"
+                             styleClass="area"
+                             cols="100" rows="14"
+                             readonly="true" />
+        </h:panelGrid>
+
+        <!-- Messages globaux -->
+        <p:messages id="messages"
+                    globalOnly="true"
+                    autoUpdate="true"
+                    showSummary="true"
+                    showDetail="true"
+                    redisplay="false"
+                    closable="true"/>
+
+    </h:form>
+</h:body>
+</html>
